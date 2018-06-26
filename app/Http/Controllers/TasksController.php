@@ -15,11 +15,17 @@ class TasksController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
-
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+        if(\Auth::check()){
+            $user = \Auth::user();
+            $tasks = Task::where('user_id', $user->id)->get();
+            return view('tasks.index', [
+                'tasks' => $tasks,
+            ]);
+        } else {
+            return view('welcome');
+        }
+        
+        
 
     }
 
@@ -54,6 +60,7 @@ class TasksController extends Controller
         $task = new Task;
         $task->status = $request->status;   
         $task->content = $request->content;
+        $task->user_id = \Auth::user()->id;
         $task->save();
 
         return redirect('/');
@@ -108,11 +115,10 @@ class TasksController extends Controller
          $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
-
         return redirect('/');
 
-    }
-
+     }
+    
     /**
      * Remove the specified resource from storage.
      *
@@ -128,3 +134,4 @@ class TasksController extends Controller
 
     }
 }
+
